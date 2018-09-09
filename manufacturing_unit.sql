@@ -254,6 +254,9 @@ CREATE TABLE IF NOT EXISTS [track_opt_performancs]
 	[operatorId] TEXT NOT NULL,
 	[no_faulty_product]  INTEGER NOT NULL
 );
+
+
+
 CREATE TRIGGER IF NOT EXISTS t_temp AFTER INSERT ON [claimed_unit_operatorDetails]
   BEGIN
 	UPDATE [track_opt_performancs] SET [no_faulty_product]=(SELECT no_faulty_product FROM [track_opt_performancs] WHERE [operatorId]=NEW.operatorId)+1 WHERE [operatorId]=NEW.[operatorId];
@@ -265,14 +268,22 @@ CREATE TABLE IF NOT EXISTS [Black_listed_operators]
 	b_operatorId TEXT NOT NULL,
 	CONSTRAINT [pkc_black_listed_operators] Primary Key([b_operatorId])
 );
+
+
+
 CREATE TRIGGER IF NOT EXISTS [t_tracktoblacklist] AFTER UPDATE ON [track_opt_performancs]
  WHEN NEW.[no_faulty_product]> (SELECT [minlimit] FROM [current_min_fault_that_allowed])
  BEGIN
  	INSERT INTO [Black_listed_operators] VALUES(NEW.operatorId);
  END;
 /*-----------------------------------------------View For Product Code--------------------------------------------------------------------*/
+
+
+
 CREATE VIEW IF NOT EXISTS v_claimInfo AS SELECT productID,unitID,operatorID,mfd_date,lotNo,(productID||unitID||operatorID||mfd_date||lotNo) as Pro_Code  FROM manufact_productCode; 
 /*----------------------------------------------------------------------------------------------------------------------------------------*/
+
+
 
 CREATE TRIGGER IF NOT EXISTS [t_blacklistopre] AFTER INSERT ON [Black_listed_operators]
  BEGIN
